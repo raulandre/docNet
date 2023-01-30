@@ -1,25 +1,18 @@
 using System.Reflection;
 using docNet.Attributes;
 using docNet.Core;
+using docNet.Core.Generators;
+using docNet.Core.Writers;
 
 namespace docNet.Test;
 
-[ClassDoc(@"
-    This is my sample test class!
-")]
 public class ScannerTest
 {
-    [PropDoc(@"
-        This is my sample prop!
-    ")]
-    public string SampleProp { get; set; }
     
     [Fact]
-    [MethodDoc(@"
-        This is my sample test method!
-    ")]
     public void Test()
     {
-        var sc = Scanner.Scan(Assembly.GetExecutingAssembly());
+        var docs = Scanner.Scan(Assembly.GetExecutingAssembly());
+        new DefaultGenerator(new DefaultWriter(), docs.ToArray()).Generate();
     }
 }

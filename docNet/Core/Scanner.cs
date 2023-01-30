@@ -18,25 +18,27 @@ namespace docNet.Core {
                 //Get prop text from class
                 var classDocText = c.GetCustomAttribute<ClassDoc>()
                     .Text.Trim();
-                var classDoc = new Doc(DocType.Class, classDocText);
-
-                //Find all method docs from class
-                var methods = c.GetMethods()
-                    .Where(m => m.GetCustomAttributes(typeof(MethodDoc), false).Length == 1)
-                    .Select(m => m.GetCustomAttribute<MethodDoc>().Text.Trim())
-                    .Select(m => new Doc(DocType.Method, m))
-                    .ToArray();
-
-                //Find all prop docs from class
-                var props = c.GetProperties()
-                    .Where(p => p.GetCustomAttributes(typeof(MethodDoc), false).Length == 1)
-                    .Select(p => p.GetCustomAttribute<PropDoc>().Text.Trim())
-                    .Select(p => new Doc(DocType.Prop, p))
-                    .ToArray();
+                var classDoc = new Doc(DocType.Class, classDocText)
+                {
+                    Name = c.Name
+                };
 
                 //Register all docs found
-                classDoc.AddMethods(methods);
-                classDoc.AddProps(props);
+                classDoc.AddProps((from prop in c.GetProperties()
+                        .Where(p => p.GetCustomAttributes(typeof(PropDoc), false).Length == 1)
+                    let attr = prop.GetCustomAttribute<PropDoc>()
+                    let name = $"{prop.PropertyType.Name} {prop.Name}"
+                    let text = attr.Text.Trim().Replace('\u0009', ' ')
+                    select new Doc(DocType.Prop, text, name)).ToArray());
+                
+                classDoc.AddMethods((from method in c.GetMethods()
+                        .Where(m => m.GetCustomAttributes(typeof(MethodDoc), false).Length == 1)
+                    let attr = method.GetCustomAttribute<MethodDoc>()
+                    let parameters = method.GetParameters()
+                        .Select(p => $"{p.ParameterType.Name} {p.Name}")
+                    let name = $"{method.ReturnType.Name} {method.Name}({string.Join(", ", parameters)})"
+                    let text = attr.Text.Trim().Replace('\u0009', ' ')
+                    select new Doc(DocType.Prop, text, name)).ToArray());
                 
                 //Add doc to return list
                 docs.Add(classDoc);

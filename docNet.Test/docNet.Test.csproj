@@ -25,4 +25,8 @@
     <ProjectReference Include="..\docNet\docNet.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Docs" />
+  </ItemGroup>
+
 </Project>

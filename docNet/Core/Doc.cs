@@ -5,15 +5,19 @@ namespace docNet.Core
 {
     public class Doc
     {
-        private DocType Type { get; set; }
-        private string Text { get; set; }
-        private List<Doc> Methods { get; set; } = new List<Doc>();
-        private List<Doc> Properties { get; set; } = new List<Doc>();
+        public DocType Type { get; private set; }
+        public string Text { get; private set; }
+        public string Name { get; set; }
+        
+        //TODO: maybe encapsulate these lists in a better way
+        public List<Doc> Methods { get; private set; } = new List<Doc>();
+        public List<Doc> Properties { get; private set; } = new List<Doc>();
 
-        public Doc(DocType type, string text)
+        public Doc(DocType type, string text, string name = null)
         {
             Type = type;
             Text = text;
+            Name = name;
         }
 
         public void AddMethods(params Doc[] docs)
