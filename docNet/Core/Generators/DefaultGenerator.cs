@@ -6,10 +6,10 @@ namespace docNet.Core.Generators
 {
     public class DefaultGenerator : IGenerator
     {
-        private List<Doc> _docs;
+        private List<ClassDocumentation> _docs;
         private IWriter _writer;
 
-        public DefaultGenerator(IWriter writer, params Doc[] docs)
+        public DefaultGenerator(IWriter writer, params ClassDocumentation[] docs)
         {
             _writer = writer;
             _docs = docs.ToList();

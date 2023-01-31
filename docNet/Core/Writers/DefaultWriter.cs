@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using System.Text;
 using docNet.Enums;
 
@@ -23,7 +24,7 @@ namespace docNet.Core.Writers
             OutputDir = docsDir;
         }
         
-        public void WriteDoc(Doc doc)
+        public void WriteDoc(ClassDocumentation doc)
         {
             using (var docFile = File.Create(Path.Combine(OutputDir, $"{doc.Name}.md")))
             {
@@ -34,18 +35,20 @@ namespace docNet.Core.Writers
                 sb.AppendLine($"#### Properties");
                 foreach (var prop in doc.Properties)
                 {
-                    sb.AppendLine($"+ {prop.Name}");
+                    sb.AppendLine($"+ {prop.Type} {prop.Name} {{ {prop.AccessorTypes.Item1} get; {prop.AccessorTypes.Item2} set; }}");
                     sb.AppendLine($"> {prop.Text}");
                 }
                 
                 sb.AppendLine($"#### Methods");
                 foreach (var method in doc.Methods)
                 {
-                    sb.AppendLine($"+ {method.Name}");
+                    sb.AppendLine($"+ {method.Visiblity} {method.ReturnType} {method.Name} ({string.Join(", ", method.Params)})");
                     sb.AppendLine($"> {method.Text}");
                 }
+
+                var result = sb.ToString().Trim().Replace("<", "\\<");
                 
-                var bytes = Encoding.UTF8.GetBytes(sb.ToString().Trim());
+                var bytes = Encoding.UTF8.GetBytes(result);
                 docFile.Write(bytes, 0, bytes.Length);
             }
         }

@@ -1,12 +1,14 @@
 ### SampleClass
 This is a sample class, documented using docNet!
 #### Properties
-+ String Name
++ string Name { private get; public set; }
 > This is a sample documentation for the name prop!
-+ Int32 Age
++ int Age { public get; private set; }
 > This is a sample documentation for the age prop!
 #### Methods
-+ Void DoStuff()
++ public void DoStuff ()
 > This method does stuff...
-+ String DoOtherStuff(String s1, String s2, String s3)
++ public string DoOtherStuff (string s1, string s2, string s3)
 > This method does some other stuff...
++ public void Iterate (List\<int> nums)
+> Iterate over a list of numbers

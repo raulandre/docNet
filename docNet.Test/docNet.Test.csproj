@@ -29,4 +29,8 @@
     <Folder Include="Docs" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Remove="Docs\SampleClass.md" />
+  </ItemGroup>
+
 </Project>

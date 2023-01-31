@@ -3,42 +3,38 @@ using System.Linq;
 using System.Reflection;
 using docNet.Attributes;
 using docNet.Enums;
+using docNet.Utils;
 
 namespace docNet.Core {
     public abstract class Scanner {
-        public static IEnumerable<Doc> Scan(Assembly assembly)
+        public static IEnumerable<ClassDocumentation> Scan(Assembly assembly)
         {
             //Find all classes with 'ClassDoc' attribute
             var classes = assembly.GetTypes()
-                .Where(t => t.GetCustomAttributes(typeof(ClassDoc), false).Length == 1);
+                .Where(t => t.GetCustomAttributes(typeof(ClassDoc), false).Length == 1).ToArray();
 
-            var docs = new List<Doc>();
-            foreach(var c in classes)
+            var docs = new List<ClassDocumentation>();
+            foreach(var @class in classes)
             {
                 //Get prop text from class
-                var classDocText = c.GetCustomAttribute<ClassDoc>()
+                var classDocText = @class.GetCustomAttribute<ClassDoc>()
                     .Text.Trim();
-                var classDoc = new Doc(DocType.Class, classDocText)
-                {
-                    Name = c.Name
-                };
+                var classDoc = new ClassDocumentation(classDocText, @class.Name, @class.Namespace);
 
-                //Register all docs found
-                classDoc.AddProps((from prop in c.GetProperties()
+                classDoc.AddProps((from prop in @class.GetProperties()
                         .Where(p => p.GetCustomAttributes(typeof(PropDoc), false).Length == 1)
                     let attr = prop.GetCustomAttribute<PropDoc>()
-                    let name = $"{prop.PropertyType.Name} {prop.Name}"
                     let text = attr.Text.Trim().Replace('\u0009', ' ')
-                    select new Doc(DocType.Prop, text, name)).ToArray());
+                    let type = prop.PropertyType.GetFriendlyName()
+                    select new PropertyDocumentation(text, prop.Name, type, VisibilityUtils.GetVisibility(prop))).ToArray());
                 
-                classDoc.AddMethods((from method in c.GetMethods()
+                classDoc.AddMethods((from method in @class.GetMethods()
                         .Where(m => m.GetCustomAttributes(typeof(MethodDoc), false).Length == 1)
                     let attr = method.GetCustomAttribute<MethodDoc>()
                     let parameters = method.GetParameters()
-                        .Select(p => $"{p.ParameterType.Name} {p.Name}")
-                    let name = $"{method.ReturnType.Name} {method.Name}({string.Join(", ", parameters)})"
+                        .Select(p => $"{p.ParameterType.GetFriendlyName()} {p.Name}").ToList()
                     let text = attr.Text.Trim().Replace('\u0009', ' ')
-                    select new Doc(DocType.Prop, text, name)).ToArray());
+                    select new MethodDocumentation(text, method.Name, method.ReturnType.GetFriendlyName(), parameters, VisibilityUtils.GetVisibility(method))).ToArray());
                 
                 //Add doc to return list
                 docs.Add(classDoc);
