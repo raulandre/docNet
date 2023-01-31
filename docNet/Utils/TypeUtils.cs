@@ -31,8 +31,6 @@ namespace docNet.Utils
                 return type.Name.Split('`')[0] + "<" + string.Join(", ", type.GetGenericArguments().Select(GetFriendlyName).ToArray()) + ">";
             else
                 return type.Name;
-
-            return string.Empty;
         }    
     }
 }
