@@ -1,10 +1,18 @@
-### SampleClass
+## SampleClass
+`using docNet.Test;` 
+
 This is a sample class, documented using docNet!
+
+___
+
 #### Properties
 + string Name { private get; public set; }
 > This is a sample documentation for the name prop!
 + int Age { public get; private set; }
 > This is a sample documentation for the age prop!
+
+___
+
 #### Methods
 + public void DoStuff ()
 > This method does stuff...

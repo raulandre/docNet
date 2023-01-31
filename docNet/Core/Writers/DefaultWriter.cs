@@ -32,23 +32,31 @@ namespace docNet.Core.Writers
             using (var docFile = File.Create(Path.Combine(OutputDir, $"{doc.Namespace}/{doc.Name}.md")))
             {
                 var sb = new StringBuilder();
-                sb.AppendLine($"### {doc.Name}");
+                sb.AppendLine($"## {doc.Name}");
+                sb.AppendLine($"`using {doc.Namespace};` \n");
                 sb.AppendLine($"{doc.Text}");
-                
-                if(doc.Properties.Any())
+
+
+                if (doc.Properties.Any())
+                {
+                    sb.AppendLine("\n___\n");
                     sb.AppendLine($"#### Properties");
+                }
                 foreach (var prop in doc.Properties)
                 {
                     sb.AppendLine($"+ {prop.Type} {prop.Name} {{ {prop.AccessorTypes.Item1} get; {prop.AccessorTypes.Item2} set; }}");
-                    sb.AppendLine($"> {prop.Text}");
+                    sb.AppendLine($"> {prop.Text.Replace("\n", "\n>")}");
                 }
-                
-                if(doc.Methods.Any())
+
+                if (doc.Methods.Any())
+                {
+                    sb.AppendLine("\n___\n");
                     sb.AppendLine($"#### Methods");
+                }
                 foreach (var method in doc.Methods)
                 {
-                    sb.AppendLine($"+ {method.Visiblity} {method.ReturnType} {method.Name} ({string.Join(", ", method.Params)})");
-                    sb.AppendLine($"> {method.Text}");
+                    sb.AppendLine($"+ {method.Visiblity} {method.ReturnType} {method.Name}({string.Join(", ", method.Params)})");
+                    sb.AppendLine($"> {method.Text.Replace("\n", "\n>")}");
                 }
 
                 var result = sb.ToString().Trim().Replace("<", "\\<");
