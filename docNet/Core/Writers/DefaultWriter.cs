@@ -26,20 +26,25 @@ namespace docNet.Core.Writers
         
         public void WriteDoc(ClassDocumentation doc)
         {
-            using (var docFile = File.Create(Path.Combine(OutputDir, $"{doc.Name}.md")))
+            var namespacePath = Path.Combine(OutputDir, doc.Namespace);
+            if (!Directory.Exists(namespacePath))
+                Directory.CreateDirectory(namespacePath);
+            using (var docFile = File.Create(Path.Combine(OutputDir, $"{doc.Namespace}/{doc.Name}.md")))
             {
                 var sb = new StringBuilder();
                 sb.AppendLine($"### {doc.Name}");
                 sb.AppendLine($"{doc.Text}");
                 
-                sb.AppendLine($"#### Properties");
+                if(doc.Properties.Any())
+                    sb.AppendLine($"#### Properties");
                 foreach (var prop in doc.Properties)
                 {
                     sb.AppendLine($"+ {prop.Type} {prop.Name} {{ {prop.AccessorTypes.Item1} get; {prop.AccessorTypes.Item2} set; }}");
                     sb.AppendLine($"> {prop.Text}");
                 }
                 
-                sb.AppendLine($"#### Methods");
+                if(doc.Methods.Any())
+                    sb.AppendLine($"#### Methods");
                 foreach (var method in doc.Methods)
                 {
                     sb.AppendLine($"+ {method.Visiblity} {method.ReturnType} {method.Name} ({string.Join(", ", method.Params)})");
